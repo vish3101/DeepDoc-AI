@@ -1,0 +1,16 @@
+streamlit
+pandas
+numpy
+fastapi
+uvicorn
+langchain
+openai
+pypdf
+faiss-cpu
+python-dotenv
+PyMuPDF
+sqlalchemy
+requests
+authlib
+python-multipart
+aiofiles
