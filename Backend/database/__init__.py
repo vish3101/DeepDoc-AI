@@ -9,6 +9,9 @@ SessionLocal=sessionmaker(bind=engine,autoflush=False,autocommit=False)
 
 Base=declarative_base()
 
-inspector = inspect(engine)
-tables = inspector.get_table_names()
-print("Tables in the database:", tables)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

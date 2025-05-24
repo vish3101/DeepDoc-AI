@@ -1,9 +1,10 @@
-from database import Base
 from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
+from Backend.database import Base
 
-class Users(Base):
+
+class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, index=True)
     github_id = Column(String, unique=True)
