@@ -27,10 +27,15 @@ if option == "Upload PDF":
 
 elif option == "Ask Query":
     st.subheader("Ask a Question")
+    pdf_name=st.text_input("Enter PDF name:")
     query = st.text_input("Type your question:")
     if st.button("Submit Query"):
         try:
-            response = requests.post(f"{API_BASE_URL}/ask-query", json={"question": query})
+            payload = {
+                "pdf_name": pdf_name,
+                "question": query
+            }
+            response = requests.post(f"{API_BASE_URL}/ask-query", json=payload)
             if response.status_code == 200:
                 st.write(f"**Answer:** {response.json().get('answer', 'No answer returned.')}")
             else:
