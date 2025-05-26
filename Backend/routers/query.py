@@ -1,19 +1,27 @@
 import google.generativeai as genai
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 from Backend.utils.chroma_db_client import chroma_client
 from Backend.utils.search_pdf import search_pdf
 from config import GOOGLE_API_KEY
 
+
+class AskRequest(BaseModel):
+    pdf_name: str
+    question: str
+    
+    
 router=APIRouter()
 genai.configure(api_key=GOOGLE_API_KEY)
 
 @router.post("/ask/")
-async def ask_question(pdf_name:str,question:str):
-    
+async def ask_question(request:AskRequest):
+    pdf_name = request.pdf_name
+    question = request.question
     all_metadata = chroma_client.collection.get(include=["metadatas"])
     pdf_names_in_db = {meta["pdf_name"] for meta in all_metadata["metadatas"]}
-    print("metadata of pdfs",all_metadata)
+    print("metadata of pdfs",pdf_names_in_db)
     if pdf_name not in pdf_names_in_db:
         raise HTTPException(status_code=404, detail=f"PDF '{pdf_name}' not found in database.")
 
