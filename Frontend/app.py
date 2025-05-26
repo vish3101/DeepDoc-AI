@@ -35,7 +35,7 @@ elif option == "Ask Query":
                 "pdf_name": pdf_name,
                 "question": query
             }
-            response = requests.post(f"{API_BASE_URL}/ask-query", json=payload)
+            response = requests.post(f"{API_BASE_URL}/ask", json=payload)
             if response.status_code == 200:
                 st.write(f"**Answer:** {response.json().get('answer', 'No answer returned.')}")
             else:
