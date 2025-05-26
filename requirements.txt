@@ -3,8 +3,12 @@ pandas
 numpy
 fastapi
 uvicorn
+google-generativeai
+fitz
+sentence-transformer
 langchain
 openai
+chromadb
 pypdf
 faiss-cpu
 python-dotenv
