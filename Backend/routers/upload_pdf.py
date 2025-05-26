@@ -1,47 +1,28 @@
-import os
+from fastapi import APIRouter, File, Form, UploadFile
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
-from fastapi.responses import JSONResponse
+from Backend.utils.chroma_db_client import chroma_client
+from Backend.utils.embeddings import get_text_embedding
+from Backend.utils.pdf_processing import extract_text_from_pdf
 
 router = APIRouter()
 
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "PDFs")
-UPLOAD_DIR = os.path.abspath(UPLOAD_DIR)
-
-if not os.path.exists(UPLOAD_DIR):
-    os.makedirs(UPLOAD_DIR)
-    
-    
-@router.post("/upload-pdf")
+@router.post("/upload-pdf/")
 async def upload_pdf(file: UploadFile = File(...)):
-    if not file.filename.endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files allowed")
-    
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
-    
-    if os.path.exists(file_path):
-        return JSONResponse(
-            status_code=409,
-            content={
-                "filename": file.filename,
-                "message": "A file with this name already exists. Please rename and try again.",
-            },
-        )
-    
-    try:
-        contents = await file.read()
-        with open(file_path, "wb") as f:
-            f.write(contents)
-        print(f"Saving to: {file_path}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"File save failed: {str(e)}")
-    
-    return JSONResponse(
-        status_code=201,
-        content={
-            "filename": file.filename,
-            "message": "File uploaded successfully.",
-        },
-    )
+    pdf_path = f"Backend/PDFs/{file.filename}"
 
+    with open(pdf_path, "wb") as f:
+        file_content = file.file.read()
+        f.write(file_content)
 
+    text_chunks = extract_text_from_pdf(pdf_path)
+
+    for i, chunk in enumerate(text_chunks):
+        embedding = get_text_embedding(chunk)
+        
+        doc_id = f"{file.filename}_{i}"
+        chroma_client.add_document(doc_id, embedding, {
+            "text": chunk,
+            "pdf_name": file.filename
+        })
+
+    return {"message": f"Your PDF {file.filename} successfully processed and stored in ChromaDB"}

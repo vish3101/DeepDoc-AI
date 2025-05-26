@@ -4,6 +4,7 @@ from authlib.integrations.starlette_client import OAuth
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
+from starlette.config import Config
 
 from Backend.database import get_db  # Your DB session dependency
 from Backend.database.models import User  # Your SQLAlchemy User model
@@ -11,7 +12,9 @@ from Backend.database.models import User  # Your SQLAlchemy User model
 router = APIRouter()
 
 # OAuth configuration
+config = Config(".env")
 oauth = OAuth()
+
 oauth.register(
     name='github',
     client_id=os.getenv("GITHUB_CLIENT_ID"),
